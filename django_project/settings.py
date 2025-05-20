@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #3rd-party apps
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
     #local
     'accounts.apps.AccountsConfig',
     'posts.apps.PostsConfig'
@@ -135,3 +135,10 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "accounts.CustomUser"
+
+# django_project/settings.py
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+    "rest_framework.permissions.IsAuthenticated", # new
+    ],
+}
