@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,9 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django.contrib.sites",
     #3rd-party apps
     'rest_framework',
     'corsheaders',
+    'rest_framework.authtoken',
+    "allauth", # new
+    "allauth.account", # new
+    "allauth.socialaccount", # new
+    'dj_rest_auth',
+    "dj_rest_auth.registration", 
     #local
     'accounts.apps.AccountsConfig',
     'posts.apps.PostsConfig'
@@ -52,6 +59,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # <-- Add this line
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -74,11 +82,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "django.template.context_processors.request",
             ],
         },
     },
 ]
-
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # new
 WSGI_APPLICATION = 'django_project.wsgi.application'
 
 
@@ -140,5 +149,9 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
     "rest_framework.permissions.IsAuthenticated", # new
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [ # new
+    "rest_framework.authentication.SessionAuthentication",
+    "rest_framework.authentication.TokenAuthentication",
     ],
 }
