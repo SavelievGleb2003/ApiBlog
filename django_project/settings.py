@@ -11,21 +11,23 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from environs import Env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+env = Env()
+env.read_env()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^%jj##al4#mb!rw)yua_)_^y5k$xl#bwx%pfg%kvtxydq28&z7'
+SECRET_KEY = env.str("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['apiblog-pl0g.onrender.com', "localhost", "127.0.0.1" ]
 
 SITE_ID = 1
 # Application definition
@@ -36,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     "django.contrib.sites",
     #3rd-party apps
@@ -46,7 +49,9 @@ INSTALLED_APPS = [
     "allauth.account", # new
     "allauth.socialaccount", # new
     'dj_rest_auth',
-    "dj_rest_auth.registration", 
+    "dj_rest_auth.registration",
+    "drf_spectacular", 
+
     #local
     'accounts.apps.AccountsConfig',
     'posts.apps.PostsConfig'
@@ -55,6 +60,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware", # new
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -63,6 +69,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"] # new
+STATIC_ROOT = BASE_DIR / "staticfiles" # new
+STATICFILES_STORAGE ="whitenoise.storage.CompressedManifestStaticFilesStorage" 
 
 ROOT_URLCONF = 'django_project.urls'
 
@@ -148,10 +159,20 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 # django_project/settings.py
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-    "rest_framework.permissions.IsAuthenticated", # new
+        "rest_framework.permissions.IsAuthenticated",
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [ # new
-    "rest_framework.authentication.SessionAuthentication",
-    "rest_framework.authentication.TokenAuthentication",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",  # Add this line
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# django_project/settings.py
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Blog API Project",
+    "DESCRIPTION": "A sample blog to learn about DRF",
+    "VERSION": "1.0.0",
+# OTHER SETTINGS
 }
